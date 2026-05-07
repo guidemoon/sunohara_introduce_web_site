@@ -85,6 +85,10 @@ header.scrolled {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
 }
 
 .header-logo {
@@ -311,6 +315,7 @@ body.menu-open {
 
 @media (max-width: 600px) {
   header { padding: 8px 0; }
+  .header-inner { padding: 0 24px; }
   .book-btn {
     font-size: 0.78rem;
     padding: 7px 14px;
@@ -467,6 +472,35 @@ section.block {
 
 .journey-content p span {
   display: block;
+}
+
+.journey-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 18px;
+  padding-bottom: 2px;
+  font-family: var(--serif-en);
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+  transition: color 0.3s ease, gap 0.3s ease, border-color 0.3s ease;
+}
+
+.journey-link:hover,
+.journey-link:focus-visible {
+  color: var(--ink);
+  gap: 14px;
+  border-bottom-color: var(--ink);
+  outline: none;
+}
+
+.journey-link-arrow {
+  font-style: normal;
+  font-size: 0.95rem;
+  transition: transform 0.3s ease;
 }
 
 /* ============ Values ============ */
@@ -735,7 +769,7 @@ footer {
 <a id="top" aria-hidden="true"></a>
 
 <header id="site-header">
-  <div class="container header-inner">
+  <div class="header-inner">
     <a href="#top" class="header-logo">Mamoru Sunohara</a>
     <div class="header-actions">
       <button class="book-btn" id="book-btn" type="button">予定を調整する</button>
@@ -796,7 +830,7 @@ footer {
 <section class="hero">
   <div class="container">
     <div class="hero-eyebrow">About</div>
-    <h1>はじめまして、<br>春原 衛です。</h1>
+    <h1>はじめまして、<br>春原 衛と申します。</h1>
     <span class="hero-name">— Mamoru Sunohara</span>
     <p class="hero-tagline">
       <span>もとは医療現場で働いていました。</span>
@@ -859,6 +893,10 @@ footer {
           <p>
             <span>医療・介護現場の働き方を、もう少しだけ楽にできる仕組みを作りたいと思い、日々プロダクトと向き合っています。</span>
           </p>
+          <a href="https://artriam.com" target="_blank" rel="noopener" class="journey-link">
+            <span>artriam.com</span>
+            <span class="journey-link-arrow">→</span>
+          </a>
         </div>
       </div>
 
