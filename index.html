@@ -14,11 +14,11 @@
 :root {
   --bg: #f7f5f0;
   --ink: #1a1815;
-  --ink-soft: #3a3631;
-  --ink-muted: #6b6660;
-  --ink-faint: #a09a92;
-  --line: #d8d3ca;
-  --line-soft: #e8e4dc;
+  --ink-soft: #2a2622;
+  --ink-muted: #5a554f;
+  --ink-faint: #8a857d;
+  --line: #c8c3b9;
+  --line-soft: #ddd8cf;
 
   --serif-en: 'Cormorant Garamond', 'Noto Serif JP', serif;
   --serif-jp: 'Noto Serif JP', serif;
@@ -29,6 +29,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 80px;
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
 }
@@ -37,8 +38,8 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans-jp);
-  font-weight: 300;
-  line-height: 2;
+  font-weight: 400;
+  line-height: 1.95;
   font-feature-settings: "palt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -56,42 +57,275 @@ a {
 }
 
 .container {
-  max-width: 640px;
+  max-width: 680px;
   margin: 0 auto;
   padding: 0 28px;
 }
 
-/* ============ Header ============ */
+/* ============ Header (Fixed) ============ */
 header {
-  padding: 40px 0 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 18px 0;
+  background: rgba(247, 245, 240, 0.85);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s ease;
+}
+
+header.scrolled {
+  border-bottom-color: var(--line-soft);
 }
 
 .header-inner {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
 }
 
-.logo {
+.header-logo {
   font-family: var(--serif-en);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0.02em;
   font-style: italic;
   color: var(--ink-soft);
+  transition: color 0.3s ease;
 }
 
-.header-meta {
+.header-logo:hover {
+  color: var(--ink);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 予約ボタン */
+.book-btn {
+  font-family: var(--serif-jp);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  padding: 10px 22px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.book-btn:hover,
+.book-btn:focus-visible {
+  background: var(--ink);
+  color: var(--bg);
+  outline: none;
+}
+
+/* ハンバーガーボタン */
+.menu-toggle {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+}
+
+.menu-toggle:hover,
+.menu-toggle:focus-visible {
+  background: var(--ink);
+  outline: none;
+}
+
+.menu-toggle span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 1px;
+  background: var(--ink);
+  margin-left: -8px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.3s ease,
+              background 0.3s ease;
+}
+
+.menu-toggle:hover span,
+.menu-toggle:focus-visible span {
+  background: var(--bg);
+}
+
+.menu-toggle span:nth-child(1) { transform: translateY(-4px); }
+.menu-toggle span:nth-child(2) { transform: translateY(0); }
+.menu-toggle span:nth-child(3) { transform: translateY(4px); }
+
+/* ハンバーガー → ✕ 変形 */
+.menu-toggle.is-open span:nth-child(1) { transform: rotate(45deg); }
+.menu-toggle.is-open span:nth-child(2) { opacity: 0; }
+.menu-toggle.is-open span:nth-child(3) { transform: rotate(-45deg); }
+
+/* オーバーレイ背景 */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 24, 21, 0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  z-index: 110;
+}
+
+.menu-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* スライドメニュー本体 */
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 88vw;
+  background: var(--bg);
+  z-index: 120;
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 30px 36px;
+}
+
+.menu-panel.is-open {
+  transform: translateX(0);
+}
+
+.menu-panel-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 60px;
+}
+
+.menu-close {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+.menu-close:hover,
+.menu-close:focus-visible {
+  background: var(--ink);
+  outline: none;
+}
+
+.menu-close::before,
+.menu-close::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 1px;
+  background: var(--ink);
+  margin-left: -8px;
+  transition: background 0.3s ease;
+}
+
+.menu-close::before { transform: rotate(45deg); }
+.menu-close::after { transform: rotate(-45deg); }
+
+.menu-close:hover::before,
+.menu-close:hover::after,
+.menu-close:focus-visible::before,
+.menu-close:focus-visible::after {
+  background: var(--bg);
+}
+
+.menu-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--ink);
+  transition: padding 0.3s ease, color 0.3s ease;
+}
+
+.menu-item:first-child {
+  border-top: 1px solid var(--line-soft);
+}
+
+.menu-item:hover,
+.menu-item:focus-visible {
+  padding-left: 8px;
+  color: var(--ink-muted);
+  outline: none;
+}
+
+.menu-item-jp {
+  font-family: var(--serif-jp);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.menu-item-en {
   font-family: var(--serif-en);
   font-size: 0.78rem;
   color: var(--ink-faint);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  font-style: italic;
+}
+
+/* スクロールロック */
+body.menu-open {
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  header { padding: 14px 0; }
+  .book-btn {
+    font-size: 0.8rem;
+    padding: 8px 16px;
+    letter-spacing: 0.04em;
+  }
+  .menu-toggle { width: 38px; height: 38px; }
+  .menu-close { width: 38px; height: 38px; }
+  .header-actions { gap: 8px; }
+  .header-logo { display: none; }
+  .menu-panel { padding: 24px 28px; }
 }
 
 /* ============ Hero ============ */
 .hero {
-  padding: 140px 0 120px;
+  padding: 200px 0 120px;
 }
 
 .hero-eyebrow {
@@ -107,7 +341,7 @@ header {
 .hero h1 {
   font-family: var(--serif-jp);
   font-size: clamp(1.9rem, 4.6vw, 2.6rem);
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 0.02em;
   line-height: 1.65;
   color: var(--ink);
@@ -126,14 +360,18 @@ header {
 }
 
 .hero-tagline {
-  font-size: 0.95rem;
-  font-weight: 300;
-  line-height: 2.3;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2.1;
   color: var(--ink-soft);
 }
 
 .hero-tagline span {
   display: block;
+}
+
+@media (max-width: 600px) {
+  .hero { padding: 140px 0 80px; }
 }
 
 /* ============ Section common ============ */
@@ -153,8 +391,8 @@ section.block {
 
 .section-title {
   font-family: var(--serif-jp);
-  font-size: clamp(1.3rem, 2.6vw, 1.55rem);
-  font-weight: 400;
+  font-size: clamp(1.35rem, 2.6vw, 1.6rem);
+  font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1.6;
   margin-bottom: 72px;
@@ -163,10 +401,10 @@ section.block {
 
 /* ============ Prose paragraphs ============ */
 .prose p {
-  font-size: 0.95rem;
-  font-weight: 300;
-  line-height: 2.3;
-  margin-bottom: 36px;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2.1;
+  margin-bottom: 32px;
   color: var(--ink-soft);
 }
 
@@ -198,8 +436,8 @@ section.block {
 
 .journey-content h3 {
   font-family: var(--serif-jp);
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-size: 1.08rem;
+  font-weight: 500;
   margin-bottom: 8px;
   letter-spacing: 0.02em;
   color: var(--ink);
@@ -216,9 +454,9 @@ section.block {
 }
 
 .journey-content p {
-  font-size: 0.92rem;
-  font-weight: 300;
-  line-height: 2.2;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 2;
   color: var(--ink-soft);
 }
 
@@ -246,8 +484,8 @@ section.block {
 
 .value-item h3 {
   font-family: var(--serif-jp);
-  font-size: 1.05rem;
-  font-weight: 400;
+  font-size: 1.08rem;
+  font-weight: 500;
   margin-bottom: 18px;
   letter-spacing: 0.02em;
   color: var(--ink);
@@ -255,9 +493,9 @@ section.block {
 }
 
 .value-item p {
-  font-size: 0.92rem;
-  font-weight: 300;
-  line-height: 2.2;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 2;
   color: var(--ink-soft);
 }
 
@@ -267,9 +505,9 @@ section.block {
 
 /* ============ Hobbies ============ */
 .hobbies-intro p {
-  font-size: 0.95rem;
-  font-weight: 300;
-  line-height: 2.3;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2.1;
   color: var(--ink-soft);
   margin-bottom: 56px;
 }
@@ -316,9 +554,9 @@ section.block {
 }
 
 .contact-intro p {
-  font-size: 0.95rem;
-  font-weight: 300;
-  line-height: 2.3;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2.1;
   color: var(--ink-soft);
   margin-bottom: 64px;
 }
@@ -342,9 +580,11 @@ section.block {
 
 .social-row:first-child { border-top: 1px solid var(--line-soft); }
 
-.social-row:not(.disabled):hover {
+.social-row:not(.disabled):hover,
+.social-row:not(.disabled):focus-visible {
   color: var(--ink-muted);
   padding-left: 8px;
+  outline: none;
 }
 
 .social-name {
@@ -416,6 +656,38 @@ section.block {
   }
 }
 
+/* ============ Schedule ============ */
+.schedule-block {
+  padding: 100px 0;
+}
+
+.schedule-intro p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 2.1;
+  color: var(--ink-soft);
+  margin-bottom: 64px;
+}
+
+.schedule-intro p span { display: block; }
+
+.schedule-frame {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 48px;
+  min-height: 400px;
+}
+
+#timerex_calendar {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#timerex_calendar iframe {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
 /* ============ Footer ============ */
 footer {
   padding: 80px 0 60px;
@@ -437,7 +709,7 @@ footer {
   .reveal {
     opacity: 0;
     transform: translateY(12px);
-    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .reveal.visible {
     opacity: 1;
@@ -455,13 +727,63 @@ footer {
 </style>
 </head>
 <body>
+<a id="top" aria-hidden="true"></a>
 
-<header>
+<header id="site-header">
   <div class="container header-inner">
-    <span class="logo">Mamoru Sunohara</span>
-    <span class="header-meta">2026</span>
+    <a href="#top" class="header-logo">Mamoru Sunohara</a>
+    <div class="header-actions">
+      <button class="book-btn" id="book-btn" type="button">予定を調整する</button>
+      <button class="menu-toggle" id="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
   </div>
 </header>
+
+<!-- スライドメニュー -->
+<div class="menu-overlay" id="menu-overlay"></div>
+<aside class="menu-panel" id="menu-panel" aria-hidden="true">
+  <div class="menu-panel-header">
+    <button class="menu-close" id="menu-close" type="button" aria-label="メニューを閉じる"></button>
+  </div>
+  <nav class="menu-list">
+    <a href="#top" class="menu-item">
+      <span class="menu-item-jp">トップへ</span>
+      <span class="menu-item-en">Top</span>
+    </a>
+    <a href="#about-me" class="menu-item">
+      <span class="menu-item-jp">わたしについて</span>
+      <span class="menu-item-en">About</span>
+    </a>
+    <a href="#journey" class="menu-item">
+      <span class="menu-item-jp">これまでの歩み</span>
+      <span class="menu-item-en">Journey</span>
+    </a>
+    <a href="#values" class="menu-item">
+      <span class="menu-item-jp">考えていること</span>
+      <span class="menu-item-en">Values</span>
+    </a>
+    <a href="#tech-stack" class="menu-item">
+      <span class="menu-item-jp">技術スタック</span>
+      <span class="menu-item-en">Tech Stack</span>
+    </a>
+    <a href="#off-work" class="menu-item">
+      <span class="menu-item-jp">仕事以外のこと</span>
+      <span class="menu-item-en">Off Work</span>
+    </a>
+    <a href="#schedule" class="menu-item">
+      <span class="menu-item-jp">時間を合わせて話す</span>
+      <span class="menu-item-en">Schedule</span>
+    </a>
+    <a href="#contact" class="menu-item">
+      <span class="menu-item-jp">つながる</span>
+      <span class="menu-item-en">Contact</span>
+    </a>
+  </nav>
+</aside>
 
 <main>
 
@@ -480,12 +802,20 @@ footer {
 </section>
 
 <!-- ABOUT ME -->
-<section class="block">
+<section class="block" id="about-me">
   <div class="container">
     <div class="section-label">About Me</div>
     <h2 class="section-title">わたしについて</h2>
 
     <div class="prose">
+      <p>
+        <span>もともとは、ズッキーニ農家とえのき工場を営む自営業の家に、長男として生まれました。</span>
+        <span>小学生の頃から、加工、経理、営業、現場の整備まで、家業のひととおりを手伝ってきました。</span>
+        <span>一からお客様と向き合い、信頼を積み上げていく両親の姿が、わたしにとって最初に見た「働く大人」の姿でした。</span>
+        <span>商売が伸びていく時期も、家業を閉じる決断に至った時期も、家族としてその全部を見てきました。</span>
+        <span>ものごとを成立させることと、成立させ続けることが、どれほど別の難しさを持つのか。</span>
+        <span>仕事についての最初の感覚は、たぶんこの時期に決まったのだと思います。</span>
+      </p>
       <p>
         <span>最初の社会人としての出発点は、地方の総合病院で臨床工学技士として働いたことでした。</span>
         <span>透析業務や人工呼吸器管理の現場で日々目にしていたのは、技術的には解決できるはずの不便が、慣習や仕組みの不在によって温存され続けている景色でした。</span>
@@ -509,7 +839,7 @@ footer {
 </section>
 
 <!-- JOURNEY -->
-<section class="block">
+<section class="block" id="journey">
   <div class="container">
     <div class="section-label">Journey</div>
     <h2 class="section-title">これまでの歩み</h2>
@@ -569,7 +899,7 @@ footer {
 </section>
 
 <!-- VALUES -->
-<section class="block">
+<section class="block" id="values">
   <div class="container">
     <div class="section-label">Values</div>
     <h2 class="section-title">考えていること</h2>
@@ -618,7 +948,7 @@ footer {
 </section>
 
 <!-- TOOLBOX -->
-<section class="block">
+<section class="block" id="tech-stack">
   <div class="container">
     <div class="section-label">Tech Stack</div>
     <h2 class="section-title">技術スタック</h2>
@@ -660,7 +990,7 @@ footer {
 </section>
 
 <!-- HOBBIES -->
-<section class="block">
+<section class="block" id="off-work">
   <div class="container">
     <div class="section-label">Off Work</div>
     <h2 class="section-title">仕事以外のこと</h2>
@@ -690,17 +1020,43 @@ footer {
   </div>
 </section>
 
+<!-- SCHEDULE -->
+<section class="schedule-block" id="schedule">
+  <div class="container">
+    <div class="section-label">Schedule</div>
+    <h2 class="section-title">時間を合わせて話す</h2>
+
+    <div class="schedule-intro">
+      <p>
+        <span>ヘルスケアDX、業務改善、生成AIの活用。あるいは、</span>
+        <span>ただの雑談でも。ご都合のよろしいときに、ぜひお話しさせてください。</span>
+      </p>
+    </div>
+
+    <div class="schedule-frame">
+      <!-- TimeRex Widget -->
+      <div id="timerex_calendar" data-url="https://timerex.net/s/mamoru.sunohara_5008/f947c253"></div>
+      <noscript>
+        <p style="text-align:center;color:var(--ink-muted);padding:40px 0;">
+          カレンダー予約をご利用いただくには、JavaScriptを有効にしてください。<br>
+          または直接こちらから予約できます: 
+          <a href="https://timerex.net/s/mamoru.sunohara_5008/f947c253" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline;">TimeRex で予約する</a>
+        </p>
+      </noscript>
+    </div>
+  </div>
+</section>
+
 <!-- CONTACT -->
-<section class="contact-block">
+<section class="contact-block" id="contact">
   <div class="container">
     <div class="section-label">Contact</div>
     <h2 class="section-title">つながる</h2>
 
     <div class="contact-intro">
       <p>
-        <span>気軽に話してみたい方、似たテーマに関心がある方、</span>
-        <span>ふらっとメッセージをいただけたら嬉しいです。</span>
-        <span>SNSはどれもゆるやかに動かしています。</span>
+        <span>各種SNSも、ほそぼそとやっています。</span>
+        <span>もしよろしければ、覗いていただけたら嬉しいです。</span>
       </p>
     </div>
 
@@ -760,6 +1116,7 @@ footer {
 </footer>
 
 <script>
+  // フェードインアニメーション
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -770,11 +1127,115 @@ footer {
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
 
-    document.querySelectorAll('.section-label, .section-title, .prose, .journey-item, .value-item, .toolbox-row, .hobbies-intro, .hobbies-list, .contact-intro, .social-list').forEach(el => {
+    document.querySelectorAll('.section-label, .section-title, .prose, .journey-item, .value-item, .toolbox-row, .hobbies-intro, .hobbies-list, .schedule-intro, .schedule-frame, .contact-intro, .social-list').forEach(el => {
       el.classList.add('reveal');
       observer.observe(el);
     });
   }
+
+  // ヘッダー: スクロール時に下罫線を出す
+  (function() {
+    const header = document.getElementById('site-header');
+    if (!header) return;
+    const onScroll = () => {
+      if (window.scrollY > 8) header.classList.add('scrolled');
+      else header.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+
+  // ハンバーガーメニュー
+  (function() {
+    const toggle = document.getElementById('menu-toggle');
+    const close = document.getElementById('menu-close');
+    const overlay = document.getElementById('menu-overlay');
+    const panel = document.getElementById('menu-panel');
+    const items = document.querySelectorAll('.menu-item');
+    if (!toggle || !panel) return;
+
+    const open = () => {
+      toggle.classList.add('is-open');
+      overlay.classList.add('is-open');
+      panel.classList.add('is-open');
+      panel.setAttribute('aria-hidden', 'false');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('menu-open');
+    };
+    const shut = () => {
+      toggle.classList.remove('is-open');
+      overlay.classList.remove('is-open');
+      panel.classList.remove('is-open');
+      panel.setAttribute('aria-hidden', 'true');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('menu-open');
+    };
+
+    toggle.addEventListener('click', () => {
+      if (panel.classList.contains('is-open')) shut();
+      else open();
+    });
+    if (close) close.addEventListener('click', shut);
+    if (overlay) overlay.addEventListener('click', shut);
+    items.forEach(item => item.addEventListener('click', shut));
+
+    // Escキーで閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.classList.contains('is-open')) shut();
+    });
+  })();
+
+  // 予約ボタン → Scheduleセクションへスクロール
+  (function() {
+    const btn = document.getElementById('book-btn');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const target = document.getElementById('schedule');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  })();
+
+  // TimeRex 埋め込みスクリプトの動的ロード
+  (function() {
+    const calendarEl = document.getElementById('timerex_calendar');
+    if (!calendarEl) return;
+
+    // フォールバック表示用のリンクを準備
+    const fallbackUrl = calendarEl.getAttribute('data-url');
+    const showFallback = () => {
+      if (calendarEl.children.length === 0 && !calendarEl.querySelector('iframe')) {
+        calendarEl.innerHTML = '<p style="text-align:center;color:var(--ink-muted);padding:40px 0;line-height:1.9;">' +
+          'カレンダーの読み込みに失敗しました。<br>' +
+          '<a href="' + fallbackUrl + '" target="_blank" rel="noopener" style="color:var(--ink);text-decoration:underline;">こちらから予約画面を開けます →</a>' +
+          '</p>';
+      }
+    };
+
+    const script = document.createElement('script');
+    script.src = 'https://asset.timerex.net/js/embed.js';
+    script.async = true;
+    script.onload = function() {
+      if (typeof TimerexCalendar === 'function') {
+        try {
+          TimerexCalendar();
+          // 8秒経ってもカレンダー要素が描画されていなければフォールバック
+          setTimeout(showFallback, 8000);
+        } catch (e) {
+          console.error('TimerexCalendar 初期化エラー:', e);
+          showFallback();
+        }
+      } else {
+        showFallback();
+      }
+    };
+    script.onerror = function() {
+      console.error('TimeRex スクリプトの読み込みに失敗');
+      showFallback();
+    };
+    document.body.appendChild(script);
+  })();
 </script>
 
 </body>
